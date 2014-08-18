@@ -1,0 +1,46 @@
+The torch framework is designed to facilitate the rapid development of web applications. It wraps within it PHP ActiveRecord as well as a simple design for creating controllers to handle web api requests.
+
+The ability to run CRUD operations can be done with rest calls by using POST to create data, GET to read data, PUT to update data, and DELETE to delete the data from the server.
+
+An example controller will be provided.
+
+A config.php file will need to be created to apear as follows:
+
+<?php
+define(CONTROLLER_NAME_LOCATION, 2); //fix
+define('PP_CONFIG_PATH', __DIR__);
+
+$config = array(
+	'default_connection' => 'development',
+	'db' => array(
+		'development' => array(
+			'db_type' => 'mysql',
+			'username' => '<username>', //fix
+			'password' => '<password>', //fix
+			'hostname' => 'localhost', //fix
+			'db_name' => '<database name>'
+		),
+		'production' => array(
+			'db_type' => 'mysql',
+			'username' => '<username>', //fix
+			'password' => '', //fix
+			'hostname' => '', //fix
+			'db_name' => 'torch_framework'
+		)
+	),
+	'site' => '<Site Name>',
+	'site_email' => '<site@email.address>'
+);
+
+// Below is generic code... do not modify.
+$connections = array();
+foreach($config['db'] as $key => $connection) {
+	$cnctn = '';
+	$cnctn .= "{$connection['db_type']}://";
+	$cnctn .= "{$connection['username']}";
+	$cnctn .= ($connection['password']) ? ":{$connection['password']}" : '';
+	$cnctn .= "@{$connection['hostname']}/";
+	$cnctn .= "{$connection['db_name']}";
+
+	$connections[$key] = $cnctn;
+}
