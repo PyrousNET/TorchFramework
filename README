@@ -4,8 +4,8 @@ The ability to run CRUD operations can be done with rest calls by using POST to 
 
 An example controller will be provided.
 
-A config.php file will need to be created to apear as follows:
-```
+A config.php file will need to be created to appear as follows:
+:::php
 <?php
 define(CONTROLLER_NAME_LOCATION, 2); //fix
 define('PP_CONFIG_PATH', __DIR__);
@@ -44,4 +44,3 @@ foreach($config['db'] as $key => $connection) {
 
 	$connections[$key] = $cnctn;
 }
-```
