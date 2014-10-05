@@ -131,11 +131,11 @@ try {
 
 		foreach($sqlLists as $sql) {
 			$connection->query($sql);
-
-			$migration_container = new Migrations();
-			$migration_container->name = $migration;
-			$migration_container->save();
 		}
+
+		$migration_container = new Migrations();
+		$migration_container->name = $migration;
+		$migration_container->save();
 	}
 
 	$connection->query("commit");
