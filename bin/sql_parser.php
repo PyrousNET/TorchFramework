@@ -29,8 +29,8 @@ try {
 	var_dump($e->getMessage());
 
 	// Email the Admin
-	$to      = 'benjamin.payne@pyrous.net';
-	$subject = 'Food Service Rebates ERROR';
+	$to      = '<to address>';
+	$subject = 'ERROR';
 	$boundary = uniqid('np');
 	$message = $e->getMessage() . "\r\n" . $e->getTraceAsString() . "\r\n" 
 				.'The exception happened on line '.$e->getLine().' of '.$e->getFile();
@@ -39,7 +39,7 @@ try {
 	$message .= '<!DOCTYPE html><html><body><h1>' .$e->getMessage() . '</h1><p>' .$e->getTraceAsString() . '</p>'
 				.'<p>The exception happened on line '.$e->getLine().' of '.$e->getFile().'</p></body></html>';
 
-	$headers = 'From: bugs@foodservicerebates.com' . "\r\n" .
+	$headers = 'From: <from address>' . "\r\n" .
 			'To: ' . $to . "\r\n" .
 			'X-Mailer: PHP/' . phpversion();
 	$headers .= "MIME-Version: 1.0\r\n";
