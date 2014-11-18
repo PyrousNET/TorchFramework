@@ -1,4 +1,4 @@
-CREATE TABLE task (
+CREATE TABLE tasks (
 		task_id BIGINT NOT NULL AUTO_INCREMENT,
 		PRIMARY KEY(task_id),
 		`type` VARCHAR(64) NOT NULL,
