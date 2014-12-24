@@ -29,7 +29,12 @@ A config.php file will need to be created to appear as follows:
 		)
 	),
 	'site' => '<Site Name>',
-	'site_email' => '<site@email.address>'
+	'site_email' => '<site@email.address>',
+	'no_auth' => array(
+		'site_information',
+		'user_types'
+	)
+
     );
 
     // Below is generic code... do not modify.

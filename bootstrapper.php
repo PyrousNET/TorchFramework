@@ -12,15 +12,14 @@ class bootstrapper {
 	}
 
 	function handle_request() {
+		GLOBAL $config;
+
 		$pathParts = array_values(array_filter(split('/', $this->_path)));
 		$type = (isset($pathParts[CONTROLLER_NAME_LOCATION])) ? $pathParts[CONTROLLER_NAME_LOCATION] : null;
 
-		// TODO - Put the exception types inside of the config file.
 		if ($type === 'user' && $_SERVER['REQUEST_METHOD'] === 'GET' && $_GET['type'] === 'activate') {
 		} else if (!($type === 'user' && $_SERVER['REQUEST_METHOD'] === 'POST')
-			and !($type === 'product')
-			and !($type === 'site_information')
-			and !($type === "user_types")) {
+			and !(in_array($type, $config['no_auth']))){
 			$validate_message = bootstrapper::post_validate_request($url['path']);
 			if (!empty($validate_message)) {
 				header("HTTP/1.0 401");
