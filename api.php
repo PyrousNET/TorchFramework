@@ -68,7 +68,7 @@ try {
 	var_dump($e->getMessage());
 
 	// Email the Admin
-	$to      = 'benjamin.payne@pyrous.net';
+	$to      = $config['site_email'];
 	$subject = $config['site'] . ' ERROR';
 	$boundary = uniqid('np');
 	$message = $e->getMessage() . "\r\n" . $e->getTraceAsString() . "\r\n" 
