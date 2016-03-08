@@ -4,8 +4,14 @@ require_once('controller_interface.php');
 abstract class abstract_controller implements icontroller {
 	protected $_data;
 	protected $_method;
+	protected $_memcache;
+	protected $_key;
+	protected $_user;
 
-	function __construct() {
+	function __construct($memcache, $key) {
+		$this->_memcache = $memcache;
+		$this->_key = $key;
+
 		$post_data = file_get_contents("php://input");
 		$json_input = json_decode($post_data);
 
@@ -17,6 +23,8 @@ abstract class abstract_controller implements icontroller {
 		$this->_method = $_SERVER['REQUEST_METHOD'];
 		$this->_data = $json_input;
 		$this->_raw_data = $post_data;
+		$this->_user = $this->_memcache->get($this->_key."_user");
+
 	}
 
 	/*

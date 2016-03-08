@@ -36,27 +36,40 @@ try {
 	if (!empty($validate_message)) {
 		header("HTTP/1.0 400 Incorrect API Request: ". $validate_message . ".");
 	} else {
-		$session_id = session_id();
-		if (empty($session_id)) session_start();
+		$memcache = new Memcache;
+		foreach ($config['memcache_servers'] as $server) {
+			$memcache->addServer($server,$config['memcache_port']);
+		}
 
-		if ($_SESSION['step_1'] && $_GET['shutdown'] == $site_active->key2) {
-			unset($_SESSION['step_1']);
+		$key = @$_COOKIE['key'];
+		$ip = $_SERVER['REMOTE_ADDR'];
+		$m_time = microtime(false);
+
+		$unique_id = md5($ip . $m_time . rand(0, time()));
+		if (!$key) {
+			setcookie("key", $unique_id);
+
+			$key = $unique_id;
+		}
+
+		if (@$memcache->get($key."_step_1") && @$_GET['shutdown'] == $site_active->key2) {
+			$memcache->delete($key."_step_1");
 
 			$site_active->active = false;
 			$site_active->save();
 
 			exit();
-		} else if ($_SESSION['step_1']) {
-			unset($_SESSION['step_1']);
+		} else if ($memcache->get($key."_step_1")) {
+			$memcache->delete($key."_step_1");
 		}
 
-		if ($_GET['shutdown'] && $_GET['shutdown'] == $site_active->key1) {
-			$_SESSION['step_1'] = true;
+		if (@$_GET['shutdown'] && @$_GET['shutdown'] == $site_active->key1) {
+			$memcache->set($key."_step_1", true);
 			exit('initiated');
 		}
 
 		$bootstrapper = new bootstrapper($url['path'], $_GET);
-		$result = $bootstrapper->handle_request();
+		$result = $bootstrapper->handle_request($memcache, $key);
 
 		if ($result) {
 			header("HTTP/1.0 200 OK");

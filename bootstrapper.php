@@ -11,7 +11,7 @@ class bootstrapper {
 		$this->_params = $params;
 	}
 
-	function handle_request() {
+	function handle_request($memcache, $key) {
 		GLOBAL $config;
 
 		$pathParts = array_values(array_filter(split('/', $this->_path)));
@@ -20,14 +20,14 @@ class bootstrapper {
 		if ($type === 'user' && $_SERVER['REQUEST_METHOD'] === 'GET' && $_GET['type'] === 'activate') {
 		} else if (!($type === 'user' && $_SERVER['REQUEST_METHOD'] === 'POST')
 			and !(in_array($type, $config['no_auth']))){
-			$validate_message = bootstrapper::post_validate_request($url['path']);
+			$validate_message = bootstrapper::post_validate_request($memcache, $key);
 			if (!empty($validate_message)) {
 				header("HTTP/1.0 401");
 				die();
 			}
 		}
 
-		$controller = controller_factory::get_controller($type);
+		$controller = controller_factory::get_controller($memcache, $key, $type);
 
 		if (isset($controller))
 			return $controller->handle_request($this->_params); // Should return an array
@@ -41,8 +41,10 @@ class bootstrapper {
 		return $message;
 	}
 
-	static function post_validate_request() {
-		if (!isset($_SESSION['user'])) return 'Please Log In';
+	static function post_validate_request($memcache, $key) {
+		$user = $memcache->get($key."_user");
+
+		if (!$user) return 'Please Log In';
 	}
 }
 ?>
