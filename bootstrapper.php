@@ -20,11 +20,19 @@ class bootstrapper {
 		if ($type === 'user' && $_SERVER['REQUEST_METHOD'] === 'GET' && $_GET['type'] === 'activate') {
 		} else if (!($type === 'user' && $_SERVER['REQUEST_METHOD'] === 'POST')
 			and !(in_array($type, $config['no_auth']))){
+
 			$validate_message = bootstrapper::post_validate_request($memcache, $key);
+			unset($memcache); // No idea why we have to do this.
+
 			if (!empty($validate_message)) {
 				header("HTTP/1.0 401");
 				die();
 			}
+		}
+
+		$memcache = new Memcache;
+		foreach ($config['memcache_servers'] as $server) {
+			$memcache->addServer($server,$config['memcache_port']);
 		}
 
 		$controller = controller_factory::get_controller($memcache, $key, $type);
