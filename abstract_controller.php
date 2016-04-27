@@ -48,7 +48,7 @@ abstract class abstract_controller implements icontroller {
 			case 'DELETE': // Delete
 				$this->delete_method($params);
 				break;
-            default:
+            		default:
 			    header("HTTP/1.0 405 Method Not Allowed");
 		}
 
