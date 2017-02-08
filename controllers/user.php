@@ -12,6 +12,15 @@ class user_controller extends abstract_controller {
 	protected function post_method($params) {
 		$data = (array) $this->_data;
 
+		// Get the User's IP
+		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} else {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+
 		switch(@$params['type']) {
 			case 'login':
 				if ($data['username'] && $data['password']) {
@@ -27,6 +36,7 @@ class user_controller extends abstract_controller {
 						}
 
 						$user->login_date = date();
+						$user->ip_address = $ip;
 						$user->save();
 
 						$this->_memcache->set($this->_key . "_user", $user);
@@ -39,6 +49,30 @@ class user_controller extends abstract_controller {
 					return;
 				}
 
+				break;
+			case 'create_user':
+				$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+				try {
+					$existing_user = Users::first(array('username' => $data['username']));
+					if (!is_null($existing_user)) {
+						header('HTTP/1.0 400 User already exists with that username.');
+						return;
+					}
+				} catch (Exception $e) {
+					header('HTTP/1.0 500 ' . $e->getMessage());
+					exit();
+				}
+
+				$user = new Users();
+				$user->username = $data['username'];
+				$user->password_seed = $this->get_random_string($chars, 8);
+				$user->password = hash('sha256',$user->password_seed . $data['password']);
+				$user->full_name = $data['full_name'];
+				$user->email = $data['email'];
+				$user->date_created = date();
+				$user->ip_address = $ip;
+				$user->save();
 				break;
 			default:
 				header('HTTP/1.0 400 Incorrect Data');
