@@ -20,6 +20,10 @@ A config.php file will need to be created to appear as follows:
 			'hostname' => 'localhost', //fix
 			'db_name' => '<database name>'
 		),
+		'memcache_servers' => array (
+			'localhost' //fix
+		),
+		'memcache_port'=>11211, //fix
 		'production' => array(
 			'db_type' => 'mysql',
 			'username' => '<username>', //fix
