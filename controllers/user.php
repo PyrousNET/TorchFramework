@@ -27,8 +27,10 @@ class user_controller extends abstract_controller {
 					$user = Users::find(array('username' => $data['username']));
 
 					if (isset($user)) {
-						// Validate against password
-						$sha_password = hash('sha256',$user->password_seed . $data['password']);
+                        if (!password_verify($data['password'], $user->password)) {
+                            header('HTTP/1.0 422 Unprocessable Entity');
+                            return;
+                        }
 
 						if (!$user->active) {
 							header('HTTP/1.0 423 User Not Active');
@@ -51,8 +53,6 @@ class user_controller extends abstract_controller {
 
 				break;
 			case 'create_user':
-				$chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
 				try {
 					$existing_user = Users::first(array('username' => $data['username']));
 					if (!is_null($existing_user)) {
@@ -66,8 +66,11 @@ class user_controller extends abstract_controller {
 
 				$user = new Users();
 				$user->username = $data['username'];
-				$user->password_seed = $this->get_random_string($chars, 8);
-				$user->password = hash('sha256',$user->password_seed . $data['password']);
+                $user->password = password_hash($data['password'], PASSWORD_DEFAULT, array(
+                    "salt" => $this->get_salt(),
+                    "cost" => 12
+                ));
+
 				$user->full_name = $data['full_name'];
 				$user->email = $data['email'];
 				$user->date_created = date();
@@ -118,31 +121,16 @@ class user_controller extends abstract_controller {
 	// =======================================================
 
 	/*
-	 * get_random_string
+     * This function will generate a salt using a CSPRNG.
+     *
+     * @return String
 	 */
-	protected function get_random_string($valid_chars, $length)
-	{
-		// start with an empty random string
-		$random_string = "";
+	protected function get_salt() {
+        $f = fopen("/dev/urandom", "r");
+        $salt = hash("sha256", fread($f, 4 * 256));
+        fclose($f);
 
-		// count the number of chars in the valid chars string so we know how many choices we have
-		$num_valid_chars = strlen($valid_chars);
-
-		// repeat the steps until we've created a string of the right length
-		for ($i = 0; $i < $length; $i++)
-		{
-			// pick a random number from 1 up to the number of valid chars
-			$random_pick = mt_rand(1, $num_valid_chars);
-
-			// take the random character out of the string of valid chars
-			// subtract 1 from $random_pick because strings are indexed starting at 0, and we started picking at 1
-			$random_char = $valid_chars[$random_pick-1];
-
-			// add the randomly-chosen char onto the end of our string so far
-			$random_string .= $random_char;
-		}
-
-		// return our finished random string
-		return $random_string;
+        return $salt;
 	}
+
 }
