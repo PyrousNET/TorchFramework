@@ -35,8 +35,8 @@ class report_controller extends abstract_controller {
 
 		$authorized = false;
 
-		$page = (!empty($params['page'])) ? $params['page'] : 1;
-		$page_size = (!empty($params['page_size'])) ? $params['page_size'] : 50;
+		$page = (!empty($params['page']) && is_numeric($params['page'])) ? $params['page'] : 1;
+		$page_size = (!empty($params['page_size']) && is_numeric($params['page_size'])) ? $params['page_size'] : 50;
 		$page = $page_size * ($page - 1);
 
 		if ($params['query']) {
