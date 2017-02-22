@@ -3,5 +3,4 @@
 // !! IMPORTANT: Make sure queries do not have a semicolon ';' at the end so the pagination will work.
 $reports = array();
 
-$reports['default'] = "SELECT * from migrations";
-$reports['special'] = "SELECT `name` `label` from migrations";
+$reports['default'] = "SELECT * from testTable";

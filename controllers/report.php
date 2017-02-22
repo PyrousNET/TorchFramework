@@ -34,6 +34,11 @@ class report_controller extends abstract_controller {
 		});
 
 		$authorized = false;
+
+		$page = (!empty($params['page'])) ? $params['page'] : 1;
+		$page_size = (!empty($params['page_size'])) ? $params['page_size'] : 50;
+		$page = $page_size * ($page - 1);
+
 		if ($params['query']) {
 			$group_reports = GroupReports::all(array('conditions'=>array('group_id in (?) and report_name=? and query_name=?',$group_ids,$params['type'],$params['query'])));
 
@@ -55,9 +60,9 @@ class report_controller extends abstract_controller {
 
 		require_once('reports/'.$params['type'].'.php');
 		if ($params['query'] && $reports[$params['query']]) {
-			$query = $reports[$params['query']];
+			$query = $reports[$params['query']] ." limit $page, $page_size";
 		} else if (empty($params['query']) && $reports['default']) {
-			$query = $reports['default'];
+			$query = $reports['default'] ." limit $page, $page_size";
 		} else {
 				header("HTTP/1.0 404 Not Found");
 				die("Report Not Found.");
