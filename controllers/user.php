@@ -27,10 +27,10 @@ class user_controller extends abstract_controller {
 					$user = Users::find(array('username' => $data['username']));
 
 					if (isset($user)) {
-                        if (!password_verify($data['password'], $user->password)) {
-                            header('HTTP/1.0 422 Unprocessable Entity');
-                            return;
-                        }
+						if (!password_verify($data['password'], $user->password)) {
+							header('HTTP/1.0 422 Unprocessable Entity');
+							return;
+						}
 
 						if (!$user->active) {
 							header('HTTP/1.0 423 User Not Active');
@@ -66,10 +66,10 @@ class user_controller extends abstract_controller {
 
 				$user = new Users();
 				$user->username = $data['username'];
-                $user->password = password_hash($data['password'], PASSWORD_DEFAULT, array(
-                    "salt" => $this->get_salt(),
-                    "cost" => 12
-                ));
+				$user->password = password_hash($data['password'], PASSWORD_DEFAULT, array(
+							"salt" => $this->get_salt(),
+							"cost" => 12
+							));
 
 				$user->full_name = $data['full_name'];
 				$user->email = $data['email'];
@@ -121,16 +121,16 @@ class user_controller extends abstract_controller {
 	// =======================================================
 
 	/*
-     * This function will generate a salt using a CSPRNG.
-     *
-     * @return String
+	 * This function will generate a salt using a CSPRNG.
+	 *
+	 * @return String
 	 */
 	protected function get_salt() {
-        $f = fopen("/dev/urandom", "r");
-        $salt = hash("sha256", fread($f, 4 * 256));
-        fclose($f);
+		$f = fopen("/dev/urandom", "r");
+		$salt = hash("sha256", fread($f, 4 * 256));
+		fclose($f);
 
-        return $salt;
+		return $salt;
 	}
 
 }
