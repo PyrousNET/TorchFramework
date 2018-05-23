@@ -2,8 +2,8 @@
 require_once 'abstract_controller.php';
 
 class test_controller extends abstract_controller {
-	function __construct() {
-		parent::__construct();
+	function __construct($memcache, $key) {
+		parent::__construct($memcache, $key);
 	}
 
 	/*
